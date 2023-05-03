@@ -29,9 +29,9 @@ jobs:
           source: ./dist/
           dest: s3://${{ secrets.AWS_S3_BUCKET }}
           aws-region: us-east-1
-          follow-symlinks: true
+          follow-symlinks: false
           cache-control: max-age=604800,public
-       repository: aws-actions/amazon-s3-sync
+       
 
       - name: Invalidate CloudFront cache
         uses: aws-actions/invalidate-cloudfront-cache@v2
