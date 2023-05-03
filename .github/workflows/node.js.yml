@@ -1,7 +1,7 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
-name: Node.js CI
+name: demo-app C1
 
 on:
   push:
@@ -32,8 +32,8 @@ jobs:
           with:
             folder: build
             bucket: ${{ secrets.S3_BUCKET }}
-            bucket-region: ${{ secrets.S3_BUCKET_REGION }}
-            dist-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+            bucket-region: ${{ secrets.us-east-1 }}
+            dist-id: ${{ secrets.https://d5mbld3yue2c0.cloudfront.net }}
             invalidation: /
             delete-removed: true
             no-cache: true
