@@ -6,9 +6,7 @@ name: demo-app C1
 on:
   push:
     branches: [ "main" ]
-  
-
-jobs:
+  jobs:
   build:
 
     runs-on: ubuntu-latest
