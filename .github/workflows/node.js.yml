@@ -27,7 +27,7 @@ jobs:
         run: ng build --prod
 
       - name: Deploy to S3
-        uses: jakejarvis/s3-sync-action@master
+        uses: machinetest.zehntech.net/s3-sync-action@master
         with:
           args: --acl public-read --delete
           exclude: '.git/**'
