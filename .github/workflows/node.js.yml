@@ -1,39 +1,46 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
-name: demo-app C1
+name: Deploy to S3 and CloudFront
 
 on:
   push:
-    branches: [ "main" ]
-  jobs:
+    branches:
+      - main
+
+jobs:
   build:
-
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    strategy:
-      matrix:
-        node-version: [18.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
 
-   steps:
-        - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: npm install
 
-        - name: Install dependencies
-          run: yarn
+      - name: Build application
+        run: ng build --prod
 
-        - name: Build
-          run: yarn build
+      - name: Deploy to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --delete
+          exclude: '.git/**'
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-        - name: Deploy
-          uses: reggionick/s3-deploy@v3
-          with:
-            folder: build
-            bucket: ${{ secrets.S3_BUCKET }}
-            bucket-region: ${{ secrets.us-east-1 }}
-            dist-id: ${{ secrets.https://d5mbld3yue2c0.cloudfront.net }}
-            invalidation: /
-            delete-removed: true
-            no-cache: true
-            private: true
-            files-to-include: ".*/*,*/*,**"
+      - name: Invalidate CloudFront cache
+        uses: taylorgoolsby/cloudfront-invalidate-action@v1
+        with:
+          distribution-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+          paths: '/*'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
